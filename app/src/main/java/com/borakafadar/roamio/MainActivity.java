@@ -1,16 +1,21 @@
 package com.borakafadar.roamio;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.material.navigation.NavigationBarView;
+
+public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +30,35 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, "The app is open", Toast.LENGTH_SHORT).show();
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+        NavigationBarView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(this);
     }
 
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        Fragment selectedFragment = null;
+        int itemID = item.getItemId();
+
+        if(itemID == R.id.homeMenu){
+            selectedFragment = new HomeFragment();
+        }
+        else if(itemID == R.id.tripsMenu){
+            selectedFragment = new TripsFragment();
+            Toast.makeText(this, "Trips clicked", Toast.LENGTH_SHORT).show();
+        }
+        else if(itemID == R.id.accountMenu){
+            selectedFragment = new AccountFragment();
+            Toast.makeText(this, "Account clicked", Toast.LENGTH_SHORT).show();
+        } else {
+            return false;
+        }
+
+        if(selectedFragment != null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+        }
+        return true;
+    }
 }
