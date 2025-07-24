@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Roamio</string>
+    <string name="Hello">Welcome to </string>
 </resources>
