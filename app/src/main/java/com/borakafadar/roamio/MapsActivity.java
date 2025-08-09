@@ -10,6 +10,11 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -20,6 +25,7 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -29,8 +35,12 @@ import com.borakafadar.roamio.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMyLocationButtonClickListener, OnMyLocationClickListener {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -59,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -77,14 +88,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+        //Map view container settings
+        FrameLayout mainContentContainer = findViewById(R.id.main_content_container);
+        int screenHeight = getResources().getDisplayMetrics().heightPixels;
+
+        //80% of the screen is the map
+        int targetHeight = (int) (screenHeight * 0.80f);
+
+        ViewGroup.LayoutParams mainContentContainerParams = mainContentContainer.getLayoutParams();
+        mainContentContainerParams.height = targetHeight;
+        mainContentContainer.setLayoutParams(mainContentContainerParams);
 
 
+        //bottom sheet view settings
+        View bottomSheet = findViewById(R.id.bottom_sheet_design);
+        BottomSheetBehavior<View> bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
-        //I CAN STORE LONGITUDE AND LATITUDE IN ARRAY LIST THAN PLACE EVERYTHING ON THE MAP
+        //int peekHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,200,getResources().getDisplayMetrics()); // 200dp fixed
+        //%20 percent of the view
+        int peekHeight = (int) (screenHeight * 0.20f);
+        bottomSheetBehavior.setPeekHeight(peekHeight);
+        bottomSheetBehavior.setHideable(false);
+
+
+        //I CAN STORE LONGITUDE AND LATITUDE IN ARRAY LIST THEN PLACE EVERYTHING ON THE MAP
         //like in an 2d arraylist
     }
 
-    /**
+    /** TODO: change this comment
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
@@ -103,6 +134,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addCircle(new CircleOptions().center(sydney).fillColor(Color.BLACK).visible(true).strokeWidth(300).clickable(true));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+        mMap.setMyLocationEnabled(true);
 
         //USE POLYLINES FOR DIFFERENT ROUTES
         // Polyline
@@ -147,4 +181,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+        //Toast.makeText(this, "Current Location Button Clicked", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+        Toast.makeText(this, "Current Location" + location, Toast.LENGTH_SHORT).show();
+    }
 }
