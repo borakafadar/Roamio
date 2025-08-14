@@ -6,4 +6,8 @@
     <color name="color_primary">#1bcc23</color>
     <color name="color_accent">#FFFFFFFF</color>
 
+
+    <color name="pause_button_grey">#5f6773</color>
+    <color name="end_button_red">#eb0729</color>
+
 </resources>

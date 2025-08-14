@@ -70,4 +70,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         return true;
     }
+
+
 }

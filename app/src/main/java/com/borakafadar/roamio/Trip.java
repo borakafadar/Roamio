@@ -3,22 +3,37 @@ package com.borakafadar.roamio;
 import android.location.Location;
 import android.media.Image;
 
-import java.text.DateFormat;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Locale;
+
 
 public class Trip {
     private ArrayList<Location> locations;
-    private double time;
+    private long time;
     private ArrayList<Image> images;
     private String comments;
     private String title;
     private double distance;
     private String date;
+    private LocalDateTime localDateTime;
+    private long timestampMillis; //for time calculation
+    private boolean tripStopped;
 
     public Trip(){
-        Calendar calendar = Calendar.getInstance();
-        this.date = DateFormat.getDateInstance(DateFormat.DEFAULT).format(calendar);
+        localDateTime = LocalDateTime.now();
+        timestampMillis = Instant.now().toEpochMilli();
+        locations = new ArrayList<>();
+        time = 0;
+        images = new ArrayList<>();
+        comments = "";
+        title = "";
+        distance = 0;
+        date = "";
+        tripStopped = true;
     }
 
 
@@ -46,6 +61,46 @@ public class Trip {
             distance += locations.get(index).distanceTo(locations.get(index -1));
             calculateTotalDistance(index - 1);
         }
+    }
+
+    public void addLocation(Location location){
+        locations.add(location);
+    }
+    public Location getLastLocation(){
+        return locations.get(locations.size() - 1);
+    }
+    public ArrayList<Location> getLocations(){
+        return locations;
+    }
+
+    public String getDateTimeString(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        return localDateTime.format(formatter);
+    }
+
+    //1 second
+    public void calculateTime(){
+        if(!tripStopped){
+            long currentTime = Instant.now().toEpochMilli();
+            long timeDifference = currentTime - timestampMillis;
+            time += (long) (timeDifference / 1000.0);
+            timestampMillis = currentTime;
+        }
+        //return (long) time;
+    }
+
+    public String parseTime(){
+        calculateTime();
+        int hours = (int) (time / 3600);
+        int minutes = (int) ((time % 3600) / 60);
+        int seconds = (int) (time % 60);
+
+        return String.format(Locale.ENGLISH,"%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public void stopTrip(boolean tripStopped){
+        this.tripStopped = tripStopped;
+        timestampMillis = Instant.now().toEpochMilli();
     }
 
 }

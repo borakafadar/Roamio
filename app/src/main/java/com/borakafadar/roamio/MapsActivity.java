@@ -2,10 +2,16 @@ package com.borakafadar.roamio;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,7 +19,9 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,7 +45,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-
+import java.util.ArrayList;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMyLocationButtonClickListener, OnMyLocationClickListener {
@@ -52,16 +60,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest locationRequest;
 
     private LocationCallback locationCallback;
+    private Trip currentTrip;
+    private boolean pauseTrip;
+    private Polyline routePolyline;
+    private boolean isFollowingMyLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        currentTrip = new Trip();
+        currentTrip.stopTrip(false);
+
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         //TODO: change intervals into constants
-        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000).setMinUpdateIntervalMillis(3000).build();
+        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000).setMinUpdateIntervalMillis(2500).build();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -75,13 +90,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
 
+                //TODO: implement the distance calculation
+                //TODO: implement the pause button
                 Location location = locationResult.getLastLocation();
+                currentTrip.addLocation(location);
+                updatePolyline(location);
+
+                TextView tripTimeTextView = findViewById(R.id.tripTimeTextView);
+                tripTimeTextView.setText(currentTrip.parseTime());
 
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+                if(isFollowingMyLocation){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation)); //to focus on the moving part
                     //arbitrary number, subject to change
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); //to animate the camera
+                }
+                //mMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
+
             }
         };
 
@@ -111,6 +136,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bottomSheetBehavior.setHideable(false);
 
 
+        //TODO:initialize the buttons on a seperate method
+
+        pauseTrip = false;
+        Button pauseTripButton = findViewById(R.id.pauseTripButton);
+
+        pauseTripButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                pauseTrip = !pauseTrip;
+
+                if(pauseTrip){
+                    //TODO: do more stuff here
+                    int tintColor = ContextCompat.getColor(MapsActivity.this, R.color.roamio_green);
+                    pauseTripButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
+                    pauseTripButton.setText(R.string.resume_trip_text);
+
+                    currentTrip.stopTrip(true);
+                } else{
+                    int tintColor = ContextCompat.getColor(MapsActivity.this, R.color.pause_button_grey);
+                    pauseTripButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
+                    pauseTripButton.setText(R.string.pause_trip_text);
+
+                    currentTrip.stopTrip(false);
+                }
+            }
+        });
+
+        Button endTripButton = findViewById(R.id.endTripButton);
+
+        endTripButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder= new AlertDialog.Builder(MapsActivity.this);
+                builder.setMessage(R.string.end_trip_confirm_text).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //i do not need it to do anything for now
+                    }
+                }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO: end trip and go to main menu, do not forget to save the trip
+                        Intent intent = new Intent(MapsActivity.this,MainActivity.class);
+                        startActivity(intent);
+                    }
+                }).setTitle("End Trip?");
+                builder.show();
+            }
+        });
+
+
+        //TODO: implement the pause button
+        //for calculating the total distance when the user clicks the pause button
+        //i can calculate the total distance when the user clicks the pause button
+        //and then i can go onto a new array then calculate the total distance
+        //then add the old distance to the new distance
+        //maybe use a 2d arraylist? like first store the locations in the arraylist
+        //then store that arraylist when the user clicks the pause button
+        //then use the big arraylist to access the locations arraylists then calculate
+        //each of them and add them together
+        //but i think this would be slow as hell so maybe another solution
+
+
         //I CAN STORE LONGITUDE AND LATITUDE IN ARRAY LIST THEN PLACE EVERYTHING ON THE MAP
         //like in an 2d arraylist
     }
@@ -136,54 +226,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-        mMap.setMyLocationEnabled(true);
+
+        mMap.setOnCameraMoveStartedListener(new OnCameraMoveStartedListener() {
+            @Override
+            public void onCameraMoveStarted(int reason) {
+                if(reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE){
+                    isFollowingMyLocation = false;
+                }
+            }
+        });
+
 
         //USE POLYLINES FOR DIFFERENT ROUTES
         // Polyline
 
         updateGPS(mMap);
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        mMap.setMyLocationEnabled(true);
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback,null);
 
     }
 
     private void updateGPS(GoogleMap googleMap) {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //TODO: implement
-            //if the user declines the permission
-            System.out.println("no permission");
-        } else {
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if(location != null) {
-                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                        googleMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-                        //arbitrary number, subject to change
-                        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                    }
-                }
-            });
-
-        }
+        //TODO: make it do something
+//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            //TODO: implement
+//            //if the user declines the permission
+//            System.out.println("no permission");
+//        } else {
+//            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                @Override
+//                public void onSuccess(Location location) {
+//                    if(location != null) {
+//                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//                        googleMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
+//                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+//                        //arbitrary number, subject to change
+//                        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void updatePolyline(Location location){
+        ArrayList<LatLng> pointsLatLng = new ArrayList<>();
+        for(Location l : currentTrip.getLocations()){
+            pointsLatLng.add(new LatLng(l.getLatitude(),l.getLongitude()));
+        }
 
+        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions.addAll(pointsLatLng).width(10).visible(true).color(Color.BLUE);
+        routePolyline = mMap.addPolyline(polylineOptions);
     }
 
 
     @Override
     public boolean onMyLocationButtonClick() {
         //Toast.makeText(this, "Current Location Button Clicked", Toast.LENGTH_SHORT).show();
+        isFollowingMyLocation=true;
         return false;
     }
 
