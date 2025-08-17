@@ -58,4 +58,13 @@ public class SaveManager {
             });
         }).start();
     }
+
+    public static void updateTrip(Context context, TripEntity trip) {
+        TripDatabase db = Room.databaseBuilder(context, TripDatabase.class, "trip-database").build();
+        new Thread(() -> {
+            db.tripDao().update(trip);
+            Log.d("tripLog", "trip successfully updated");
+        }).start();
+    }
+
 }

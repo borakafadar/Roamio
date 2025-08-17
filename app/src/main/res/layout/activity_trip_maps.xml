@@ -41,83 +41,148 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10sp"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:orientation="vertical"
+
+            android:gravity="center"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pastTripTitleTextView"
+                android:text="@string/trip_title_placeholder"
+                android:textSize="30sp"/>
+            <TextView
+                android:id="@+id/pastTripCommentTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trip_comment_placeholder"
+                android:layout_marginTop="7dp"
+                android:padding="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center_horizontal"
             >
 
             <!-- For the time -->
             <LinearLayout
-                android:id="@+id/linearLayoutTime"
+                android:id="@+id/pastTripLinearLayoutTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+
                 android:gravity="center"
 
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/linearLayoutTotalDistance"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginRight="10dp"
                 >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Time:" />
+                    android:text="@string/trip_time_text" />
 
                 <TextView
                     android:id="@+id/pastTripTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0" />
+                    android:text="@string/trip_duration_placeholder" />
+
             </LinearLayout>
 
 
-            <!-- For the total distance           -->
+            <!-- For the total distance -->
             <LinearLayout
                 android:id="@+id/linearLayoutTotalDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/linearLayoutTime"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginHorizontal="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Distance:" />
+                    android:text="@string/total_distance_text" />
 
                 <TextView
                     android:id="@+id/pastTripDistanceTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="0 km" />
+                    android:text="@string/trip_distance_placeholder" />
 
             </LinearLayout>
 
+            <!-- For the date part-->
+            <LinearLayout
+                android:id="@+id/linearLayoutDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trip_date_text" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/pastTripDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="@string/trip_date_placeholder" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            >
+            android:layout_margin="10dp"
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/pastTripTitleTextView"
-                android:text="Title"/>
+            android:gravity="center">
 
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pastTripEditTitleButton"
+                app:icon="@drawable/edit_icon"
+                android:layout_marginEnd="10dp"
+                android:text="@string/rename_trip_text"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pastTripCommentButton"
+                android:layout_marginStart="10dp"
+                app:icon="@drawable/edit_icon"
+                android:text="@string/change_comment_text"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pastTripDeleteTripButton"
+                app:icon="@drawable/delete_icon"
+                android:text="@string/delete_trip_text"
+                app:backgroundTint="@color/end_button_red"/>
         </LinearLayout>
 
 

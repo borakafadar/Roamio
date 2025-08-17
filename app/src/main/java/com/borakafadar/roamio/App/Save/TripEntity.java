@@ -53,6 +53,14 @@ public class TripEntity {
         return Converter.convertJsonToTripSegments(getSegmentsJson());
     }
 
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 
     //FIXME: this results in an runtime error java.util.ConcurrentModificationException
 //    @NonNull

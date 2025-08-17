@@ -1,5 +1,6 @@
 package com.borakafadar.roamio;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import android.graphics.Color;
@@ -8,14 +9,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Save.TripEntity;
-import com.borakafadar.roamio.App.Trip;
 import com.borakafadar.roamio.App.TripSegment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,12 +25,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.borakafadar.roamio.databinding.ActivityTripMapsBinding;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,7 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
     private GoogleMap mMap;
     private ActivityTripMapsBinding binding;
     private TripEntity tripEntity;
+    private int tripID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +62,36 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
             return;
         }
 
-        int tripID = bundle.getInt("TRIP_ID");
+        tripID = bundle.getInt("TRIP_ID");
 
 
         getTripFromDatabase(tripID);
 
         TextView title = findViewById(R.id.pastTripTitleTextView);
+        TextView comments = findViewById(R.id.pastTripCommentTextView);
+        TextView date = findViewById(R.id.pastTripDateTextView);
+        TextView time = findViewById(R.id.pastTripTimeTextView);
+        TextView distance = findViewById(R.id.pastTripDistanceTextView);
+
+        Button editTitleButton = findViewById(R.id.pastTripEditTitleButton);
+
+        editTitleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateTripTitle();
+            }
+        });
+
+        Button editCommentsButton = findViewById(R.id.pastTripCommentButton);
+
+        editCommentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateTripComments();
+            }
+        });
+
+
 
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable runnable = new Runnable() {
@@ -70,6 +99,12 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
             public void run() {
                 if(tripEntity != null){
                     title.setText(tripEntity.getTitle());
+                    comments.setText(tripEntity.getComments());
+                    date.setText(tripEntity.getDate());
+                    time.setText(tripEntity.getDuration());
+                    distance.setText(String.format("%.2f", tripEntity.getDistance()) + " km");
+
+
                     updatePolylines(tripEntity.getTripSegments());
                     Log.d("tripLog", tripEntity.toString());
                 }
@@ -102,9 +137,7 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
 
 
 
-        new Thread(() -> {
 
-        });
 
 
     }
@@ -122,15 +155,25 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        getTripFromDatabase(tripID);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng bilkentUniversity = new LatLng(39.867349, 32.750255);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(bilkentUniversity));
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if(tripEntity != null){
+                    updateCamera(tripEntity.getTripSegments());
+                }
+            }
+        };
+        handler.postDelayed(runnable, 1000);
     }
 
     public void updatePolylines(ArrayList<TripSegment> tripSegments){
-        String test ="";
         for(TripSegment segment : tripSegments){
             ArrayList<LatLng> pointsLatLng = new ArrayList<>();
             for(Location l : segment.getLocations()){
@@ -142,10 +185,8 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
                     .startCap(new RoundCap()).endCap(new RoundCap())
                     .jointType(JointType.ROUND);
             Polyline routePolyline = mMap.addPolyline(polylineOptions);
-            test += segment.getLocations() +"\n";
         }
-        TextView title = findViewById(R.id.pastTripTitleTextView);
-        title.setText(tripEntity.getTitle() + "\n" + test);
+
     }
 
     public void getTripFromDatabase(int tripID){
@@ -161,4 +202,73 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
         });
 
     }
+
+    public void updateCamera(ArrayList<TripSegment> tripSegments){
+        double longitude = 0;
+        double latitude = 0;
+        int locationSize = 0;
+        //FIXME fix camera
+        for(TripSegment segment : tripSegments){
+            for(Location l : segment.getLocations()){
+                longitude+=l.getLongitude();
+                latitude+=l.getLatitude();
+                locationSize++;
+            }
+        }
+        longitude /= locationSize;
+        latitude /= locationSize;
+
+        LatLng currentLocation = new LatLng(latitude, longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+
+    }
+
+    public void updateTripTitle(){
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_input, null);
+        TextInputEditText editText = view.findViewById(R.id.tripDialogEditText);
+        TextInputLayout textInputLayout = view.findViewById(R.id.tripDialogTextInputLayout);
+        textInputLayout.setHint("Enter Trip Title");
+        editText.setText(tripEntity.getTitle());
+
+        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle("Change Trip Title")
+                .setView(view).setPositiveButton("OK", (dialog, which) -> {
+                    TextView title = findViewById(R.id.pastTripTitleTextView);
+                    title.setText(editText.getText().toString());
+                    tripEntity.setTitle(editText.getText().toString());
+
+                    SaveManager.updateTrip(this, tripEntity);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                }).create();
+
+        alertDialog.show();
+    }
+
+    public void updateTripComments(){
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_input, null);
+        TextInputEditText editText = view.findViewById(R.id.tripDialogEditText);
+        TextInputLayout textInputLayout = view.findViewById(R.id.tripDialogTextInputLayout);
+        textInputLayout.setHint("Enter Trip Comments");
+        editText.setText(tripEntity.getComments());
+
+        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle("Change Trip Comments")
+                .setView(view).setPositiveButton("OK", (dialog, which) -> {
+                    TextView comments = findViewById(R.id.pastTripCommentTextView);
+                    comments.setText(editText.getText().toString());
+                    tripEntity.setComments(editText.getText().toString());
+
+                    SaveManager.updateTrip(this, tripEntity);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                }).create();
+
+        alertDialog.show();
+    }
+
+
+
+
 }

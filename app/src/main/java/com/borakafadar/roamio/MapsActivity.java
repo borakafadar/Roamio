@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Trip currentTrip;
     private boolean pauseTrip;
     private Polyline routePolyline;
-    private boolean isFollowingMyLocation = false;
+    private boolean isFollowingMyLocation = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,11 +234,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.addCircle(new CircleOptions().center(sydney).fillColor(Color.BLACK).visible(true).strokeWidth(300).clickable(true));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
+        LatLng bilkentUniversity = new LatLng(39.867349, 32.750255);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(bilkentUniversity));
 
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
@@ -303,6 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        PolylineOptions polylineOptions = new PolylineOptions();
 //        polylineOptions.addAll(pointsLatLng).width(10).visible(true).color(Color.BLUE);
 //        routePolyline = mMap.addPolyline(polylineOptions);
+
         if(routePolyline != null){
             routePolyline.remove();
         }
@@ -335,7 +336,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, "Current Location" + location, Toast.LENGTH_SHORT).show();
     }
 
-    public void changeCurrentSegment(){
-        //TODO
-    }
 }
