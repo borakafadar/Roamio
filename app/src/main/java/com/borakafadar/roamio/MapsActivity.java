@@ -11,12 +11,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,24 +21,27 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.borakafadar.roamio.App.Save.SaveManager;
+import com.borakafadar.roamio.App.Trip;
+import com.borakafadar.roamio.App.TripSegment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.borakafadar.roamio.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -69,6 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //TODO: check permission requests
+
         currentTrip = new Trip();
         currentTrip.stopTrip(false);
 
@@ -76,7 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
 
         //TODO: change intervals into constants
-        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000).setMinUpdateIntervalMillis(2500).build();
+        // for now it is 3000 and 2500
+        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(1000).build();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -90,14 +93,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
 
-                //TODO: implement the distance calculation
+
                 //TODO: implement the pause button
                 Location location = locationResult.getLastLocation();
-                currentTrip.addLocation(location);
-                updatePolyline(location);
+                //currentTrip.addLocation(location); //old code without trip segments
+                if(!pauseTrip){
+                    currentTrip.getLatestSegment().addLocation(location);
+                }
+
+                updatePolyline();
 
                 TextView tripTimeTextView = findViewById(R.id.tripTimeTextView);
-                tripTimeTextView.setText(currentTrip.parseTime());
+                tripTimeTextView.setText(currentTrip.getDuration());
+
+                TextView tripDistanceTextView = findViewById(R.id.tripDistanceTextView);
+                tripDistanceTextView.setText(currentTrip.getDistanceString());
 
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 if(isFollowingMyLocation){
@@ -154,6 +164,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     pauseTripButton.setText(R.string.resume_trip_text);
 
                     currentTrip.stopTrip(true);
+                    currentTrip.changeSegments(new TripSegment());
+
                 } else{
                     int tintColor = ContextCompat.getColor(MapsActivity.this, R.color.pause_button_grey);
                     pauseTripButton.setBackgroundTintList(ColorStateList.valueOf(tintColor));
@@ -182,6 +194,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //TODO: end trip and go to main menu, do not forget to save the trip
                         Intent intent = new Intent(MapsActivity.this,MainActivity.class);
                         startActivity(intent);
+
+                        SaveManager.saveTrip(MapsActivity.this, currentTrip);
+
+                        MapsActivity.this.finish();
                     }
                 }).setTitle("End Trip?");
                 builder.show();
@@ -278,15 +294,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        }
     }
 
-    private void updatePolyline(Location location){
-        ArrayList<LatLng> pointsLatLng = new ArrayList<>();
-        for(Location l : currentTrip.getLocations()){
-            pointsLatLng.add(new LatLng(l.getLatitude(),l.getLongitude()));
+    private void updatePolyline(){
+//        ArrayList<LatLng> pointsLatLng = new ArrayList<>();
+//        for(Location l : currentTrip.getLocations()){
+//            pointsLatLng.add(new LatLng(l.getLatitude(),l.getLongitude()));
+//        }
+//
+//        PolylineOptions polylineOptions = new PolylineOptions();
+//        polylineOptions.addAll(pointsLatLng).width(10).visible(true).color(Color.BLUE);
+//        routePolyline = mMap.addPolyline(polylineOptions);
+        if(routePolyline != null){
+            routePolyline.remove();
         }
 
-        PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.addAll(pointsLatLng).width(10).visible(true).color(Color.BLUE);
-        routePolyline = mMap.addPolyline(polylineOptions);
+        for(TripSegment tripSegment : currentTrip.getTripSegments()){
+            ArrayList<LatLng> pointsLatLng = new ArrayList<>();
+            for(Location l : tripSegment.getLocations()){
+                pointsLatLng.add(new LatLng(l.getLatitude(),l.getLongitude()));
+            }
+
+            PolylineOptions polylineOptions = new PolylineOptions();
+            polylineOptions.addAll(pointsLatLng).width(10).visible(true).color(Color.BLUE)
+                    .startCap(new RoundCap()).endCap(new RoundCap())
+                    .jointType(JointType.ROUND);
+            routePolyline = mMap.addPolyline(polylineOptions);
+        }
     }
 
 
@@ -301,5 +333,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current Location" + location, Toast.LENGTH_SHORT).show();
+    }
+
+    public void changeCurrentSegment(){
+        //TODO
     }
 }

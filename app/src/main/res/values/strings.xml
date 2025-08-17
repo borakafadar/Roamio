@@ -7,4 +7,9 @@
     <string name="resume_trip_text">Resume Trip</string>
     <string name="pause_trip_text">Pause Trip</string>
     <string name="end_trip_confirm_text">Do you want to end your trip?</string>
+    <string name="trip_title_placeholder">Trip Title</string>
+    <string name="trip_duration_placeholder">01:30:23</string>
+    <string name="trip_date_placeholder">16/08/2025 13:51</string>
+    <string name="trip_distance_placeholder">2.37 km</string>
+    <string name="trip_comment_placeholder">This is a comment</string>
 </resources>

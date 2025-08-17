@@ -3,10 +3,21 @@ package com.borakafadar.roamio;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.borakafadar.roamio.App.Save.SaveManager;
+import com.borakafadar.roamio.App.Save.TripDatabase;
+import com.borakafadar.roamio.App.Save.TripEntity;
+import com.borakafadar.roamio.View.TripsRecyclerViewAdapter;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +34,10 @@ public class TripsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ArrayList<TripEntity> trips;
+    private RecyclerView recyclerView;
+
 
     public TripsFragment() {
         // Required empty public constructor
@@ -53,12 +68,34 @@ public class TripsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        trips = getTripsFromDatabase();
+        Log.d("tripLog","trips are loaded");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trips, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_trips, container, false);
+
+
+
+        recyclerView = view.findViewById(R.id.tripsRecyclerView);
+
+        Log.d("tripLog",trips.toString());
+        recyclerView.setAdapter(new TripsRecyclerViewAdapter(this.getActivity(), trips));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+
+        return view;
+    }
+
+
+    public ArrayList<TripEntity> getTripsFromDatabase() {
+        SaveManager.getAllTrips(this.getActivity(), trips -> {
+            Log.d("tripLog","Total trips loaded: "+trips.size());
+        });
+        return SaveManager.allTrips;
     }
 }

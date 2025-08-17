@@ -1,8 +1,12 @@
-package com.borakafadar.roamio;
+package com.borakafadar.roamio.App;
 
 import android.location.Location;
 import android.media.Image;
+import android.util.Log;
 
+
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -12,28 +16,37 @@ import java.util.Locale;
 
 
 public class Trip {
-    private ArrayList<Location> locations;
+    private int tripID;
+    private ArrayList<TripSegment> tripSegments;
     private long time;
-    private ArrayList<Image> images;
+    //private ArrayList<Image> images;
     private String comments;
     private String title;
     private double distance;
     private String date;
-    private LocalDateTime localDateTime;
     private long timestampMillis; //for time calculation
     private boolean tripStopped;
+    private TripSegment latestSegment;
 
+
+    //TODO: maybe i can add an option to merge trips.
+
+    //TODO: implement Image saving
     public Trip(){
-        localDateTime = LocalDateTime.now();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        date = localDateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy--HH-mm-ss"));
+        //Log.d("a",date);
         timestampMillis = Instant.now().toEpochMilli();
-        locations = new ArrayList<>();
         time = 0;
-        images = new ArrayList<>();
+        //images = new ArrayList<>();
         comments = "";
-        title = "";
+        title = "Trip "+date;
         distance = 0;
-        date = "";
         tripStopped = true;
+        latestSegment = new TripSegment();
+        tripSegments = new ArrayList<>();
+        tripSegments.add(latestSegment);
+
     }
 
 
@@ -41,7 +54,7 @@ public class Trip {
     //https://mapsplatform.google.com/resources/blog/how-calculate-distances-map-maps-javascript-api/
     //https://en.wikipedia.org/wiki/Haversine_formula
     //not used for now, maybe i could use it some other time
-    public double haversineFormula(double lat1,double lat2, double long1, double long2) {
+    public static double haversineFormula(double lat1,double lat2, double long1, double long2) {
 
         double R = 6371.2; // Radius of the Earth in kilometers
 
@@ -54,28 +67,19 @@ public class Trip {
 
     }
 
-    public void calculateTotalDistance(int index){
-        if(index == 0){
-            distance += 0;
-        } else{
-            distance += locations.get(index).distanceTo(locations.get(index -1));
-            calculateTotalDistance(index - 1);
+    public void calculateTotalDistance(){
+        if(tripStopped){
+            return;
+        }
+        distance = 0;
+        for(TripSegment tripSegment : tripSegments){
+            distance += tripSegment.getDistance();
         }
     }
 
-    public void addLocation(Location location){
-        locations.add(location);
-    }
-    public Location getLastLocation(){
-        return locations.get(locations.size() - 1);
-    }
-    public ArrayList<Location> getLocations(){
-        return locations;
-    }
 
     public String getDateTimeString(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        return localDateTime.format(formatter);
+        return date;
     }
 
     //1 second
@@ -89,7 +93,7 @@ public class Trip {
         //return (long) time;
     }
 
-    public String parseTime(){
+    private String parseTime(){
         calculateTime();
         int hours = (int) (time / 3600);
         int minutes = (int) ((time % 3600) / 60);
@@ -98,9 +102,42 @@ public class Trip {
         return String.format(Locale.ENGLISH,"%02d:%02d:%02d", hours, minutes, seconds);
     }
 
+    public String getDuration(){
+        return parseTime();
+    }
+
     public void stopTrip(boolean tripStopped){
         this.tripStopped = tripStopped;
         timestampMillis = Instant.now().toEpochMilli();
     }
+
+    public String getDistanceString(){
+        calculateTotalDistance();
+        return Double.toString(distance);
+    }
+
+    public void changeSegments(TripSegment tripSegment){
+        tripSegments.add(tripSegment);
+        this.latestSegment = tripSegment;
+    }
+
+    public TripSegment getLatestSegment(){
+        return latestSegment;
+    }
+
+    public ArrayList<TripSegment> getTripSegments(){
+        return tripSegments;
+    }
+
+    public String getComments(){
+        return comments;
+    }
+    public double getDistance(){
+        return distance;
+    }
+    public String getTitle(){
+        return title;
+    }
+
 
 }

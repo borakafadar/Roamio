@@ -69,6 +69,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(HomeFragment.this.getActivity(),MapsActivity.class);
                 startActivity(intent);
+                HomeFragment.this.getActivity().finish();
             }
         });
 

@@ -4,6 +4,10 @@
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorAccent">@color/color_accent</item>
+        <item name="fontWeight">800</item>
+
+    <!-- TODO: add font -->
+
 
 
     </style>

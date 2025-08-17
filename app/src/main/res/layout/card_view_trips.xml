@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="409dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="20dp"
+
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
+
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/tripCardImageView"
+                android:src="@drawable/default_trip_image"
+                />
+
+            <TextView
+                android:id="@+id/tripCardTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/trip_title_placeholder"
+                android:textSize="20sp"
+                app:layout_constraintStart_toEndOf="@+id/tripCardImageView"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!--TODO: limit the comment size idk how tho -->
+            <TextView
+                android:id="@+id/tripCardCommentsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/trip_comment_placeholder"
+                android:maxWidth="240dp"
+                app:layout_constraintStart_toStartOf="@+id/tripCardTitleTextView"
+                app:layout_constraintTop_toBottomOf="@+id/tripCardTitleTextView" />
+
+            <TextView
+                android:id="@+id/tripCardDateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textSize="11sp"
+                android:layout_marginTop="5dp"
+                android:text="@string/trip_date_placeholder"
+                app:layout_constraintStart_toStartOf="@+id/tripCardCommentsTextView"
+                app:layout_constraintTop_toBottomOf="@+id/tripCardCommentsTextView" />
+
+            <TextView
+                android:id="@+id/tripCardDurationTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trip_duration_placeholder"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tripCardDateTextView"
+                app:layout_constraintStart_toEndOf="@+id/tripCardDateTextView"
+                android:layout_marginStart="7dp"/>
+
+            <TextView
+                android:id="@+id/tripCardDistanceTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trip_distance_placeholder"
+                android:textSize="11sp"
+                android:layout_marginStart="7dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tripCardDurationTextView"
+                app:layout_constraintStart_toEndOf="@+id/tripCardDurationTextView" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/arrow_forward"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
