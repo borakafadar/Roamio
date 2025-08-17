@@ -53,15 +53,15 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         if(itemID == R.id.homeMenu){
             selectedFragment = new HomeFragment();
-            Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
         }
         else if(itemID == R.id.tripsMenu){
             selectedFragment = new TripsFragment();
-            Toast.makeText(this, "Trips clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Trips clicked", Toast.LENGTH_SHORT).show();
         }
         else if(itemID == R.id.accountMenu){
             selectedFragment = new AccountFragment();
-            Toast.makeText(this, "Account clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Account clicked", Toast.LENGTH_SHORT).show();
         } else {
             return false;
         }

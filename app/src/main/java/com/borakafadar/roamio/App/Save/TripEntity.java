@@ -1,7 +1,14 @@
 package com.borakafadar.roamio.App.Save;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import com.borakafadar.roamio.App.TripSegment;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.ArrayList;
 
 @Entity(tableName = "trips")
 public class TripEntity {
@@ -42,4 +49,16 @@ public class TripEntity {
     public String getSegmentsJson() {
         return segmentsJson;
     }
+    public ArrayList<TripSegment> getTripSegments(){
+        return Converter.convertJsonToTripSegments(getSegmentsJson());
+    }
+
+
+    //FIXME: this results in an runtime error java.util.ConcurrentModificationException
+//    @NonNull
+//    @Override
+//    public String toString() {
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//        return gson.toJson(this);
+//    }
 }

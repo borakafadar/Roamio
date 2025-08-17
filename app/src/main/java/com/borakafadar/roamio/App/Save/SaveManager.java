@@ -28,6 +28,7 @@ public class SaveManager {
     // Make the callback public so callers can pass a lambda/anonymous class
     public interface TripsCallback {
         void onTripsLoaded(List<TripEntity> trips);
+        void onTripLoaded(TripEntity trip);
     }
 
     // Expose a single public async API. Remove/stop using the sync-returning version.
@@ -41,6 +42,19 @@ public class SaveManager {
             // Notify caller on main thread
             new Handler(Looper.getMainLooper()).post(() -> {
                 callback.onTripsLoaded(allTrips);
+            });
+        }).start();
+    }
+
+    // Changed to async-only: no return value; result arrives via callback on main thread
+    public static void getTripByID(Context context, int tripID, TripsCallback callback) {
+        TripDatabase db = Room.databaseBuilder(context, TripDatabase.class, "trip-database").build();
+
+        new Thread(() -> {
+            TripEntity trip = db.tripDao().getTripByID(tripID);
+            Log.d("dbLog", "Loaded trip id=" + tripID + " found=" + (trip != null));
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.onTripLoaded(trip);
             });
         }).start();
     }

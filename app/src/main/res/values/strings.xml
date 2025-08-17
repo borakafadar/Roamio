@@ -12,4 +12,5 @@
     <string name="trip_date_placeholder">16/08/2025 13:51</string>
     <string name="trip_distance_placeholder">2.37 km</string>
     <string name="trip_comment_placeholder">This is a comment</string>
+    <string name="title_activity_trip_maps">TripMapsActivity</string>
 </resources>

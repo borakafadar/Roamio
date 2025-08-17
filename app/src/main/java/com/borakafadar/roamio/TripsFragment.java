@@ -1,5 +1,6 @@
 package com.borakafadar.roamio;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,15 +17,17 @@ import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Save.TripDatabase;
 import com.borakafadar.roamio.App.Save.TripEntity;
 import com.borakafadar.roamio.View.TripsRecyclerViewAdapter;
+import com.borakafadar.roamio.View.TripsRecyclerViewInterface;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link TripsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TripsFragment extends Fragment {
+public class TripsFragment extends Fragment implements TripsRecyclerViewInterface {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -84,8 +87,16 @@ public class TripsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.tripsRecyclerView);
 
-        Log.d("tripLog",trips.toString());
-        recyclerView.setAdapter(new TripsRecyclerViewAdapter(this.getActivity(), trips));
+
+        try {
+            Log.d("tripLog",trips.toString());
+        } catch (Exception e) {
+            Log.e("tripLog", e +"\n error happened in returning trips to string");
+        }
+
+
+
+        recyclerView.setAdapter(new TripsRecyclerViewAdapter(this.getActivity(), trips, this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
         return view;
@@ -93,9 +104,25 @@ public class TripsFragment extends Fragment {
 
 
     public ArrayList<TripEntity> getTripsFromDatabase() {
-        SaveManager.getAllTrips(this.getActivity(), trips -> {
-            Log.d("tripLog","Total trips loaded: "+trips.size());
+        SaveManager.getAllTrips(this.getActivity(), new SaveManager.TripsCallback() {
+            @Override
+            public void onTripsLoaded(List<TripEntity> trips) {
+                Log.d("tripLog","Total trips loaded: "+trips.size());
+            }
+            @Override
+            public void onTripLoaded(TripEntity trip) {
+                //nothing
+            }
         });
         return SaveManager.allTrips;
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        Intent intent = new Intent(this.getContext(),TripMapsActivity.class);
+
+        intent.putExtra("TRIP_ID", trips.get(position).tripID);
+
+        startActivity(intent);
     }
 }

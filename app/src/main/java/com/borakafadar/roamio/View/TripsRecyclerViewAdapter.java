@@ -17,12 +17,14 @@ import java.util.ArrayList;
 
 public class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecyclerViewAdapter.TripsViewHolder> {
 
+    private TripsRecyclerViewInterface tripsRecyclerViewInterface;
     private Context context;
     private ArrayList<TripEntity> trips;
 
-    public TripsRecyclerViewAdapter(Context context, ArrayList<TripEntity> trips){
+    public TripsRecyclerViewAdapter(Context context, ArrayList<TripEntity> trips, TripsRecyclerViewInterface tripsRecyclerViewInterface){
         this.context = context;
         this.trips = trips;
+        this.tripsRecyclerViewInterface=tripsRecyclerViewInterface;
     }
 
 
@@ -35,7 +37,7 @@ public class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecycler
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.card_view_trips, parent, false);
-        return new TripsViewHolder(view);
+        return new TripsViewHolder(view,tripsRecyclerViewInterface);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecycler
         ImageView tripImage;
         TextView tripTitle, tripComment, tripDate, tripDuration, tripDistance;
 
-        public TripsViewHolder(@NonNull View itemView) {
+        public TripsViewHolder(@NonNull View itemView, TripsRecyclerViewInterface tripsRecyclerViewInterface) {
             super(itemView);
 
             tripImage = itemView.findViewById(R.id.tripCardImageView);
@@ -73,6 +75,17 @@ public class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecycler
             tripDate = itemView.findViewById(R.id.tripCardDateTextView);
             tripDuration = itemView.findViewById(R.id.tripCardDurationTextView);
             tripDistance = itemView.findViewById(R.id.tripCardDistanceTextView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(tripsRecyclerViewInterface != null){
+                        if(getAdapterPosition() != RecyclerView.NO_POSITION){
+                         tripsRecyclerViewInterface.onItemClicked(getAdapterPosition());
+                        }
+                    }
+                }
+            });
         }
     }
 }

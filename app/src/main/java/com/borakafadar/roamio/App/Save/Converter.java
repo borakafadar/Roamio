@@ -16,7 +16,9 @@ public class Converter {
     public static ArrayList<TripSegment> convertJsonToTripSegments(String json){
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<TripSegment>>(){}.getType();
-        return gson.fromJson(json, type);
+        ArrayList<TripSegment> tripSegments = gson.fromJson(json, type);;
+
+        return tripSegments;
     }
 
     public static TripEntity tripToTripEntity(Trip trip){

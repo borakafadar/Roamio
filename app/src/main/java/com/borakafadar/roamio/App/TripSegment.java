@@ -2,8 +2,6 @@ package com.borakafadar.roamio.App;
 
 import android.location.Location;
 
-import com.borakafadar.roamio.App.Trip;
-
 import java.util.ArrayList;
 
 public class TripSegment {
@@ -41,6 +39,15 @@ public class TripSegment {
     }
 
     public ArrayList<Location> getLocations() {
+        if(this.locations.isEmpty() && this.serializableLocations != null){
+            parseSerializableLocations();
+        }
         return this.locations;
+    }
+    public void parseSerializableLocations(){
+        this.locations = new ArrayList<>();
+        for(SerializableLocation serializableLocation : this.serializableLocations){
+            this.locations.add(SerializableLocation.toLocation(serializableLocation));
+        }
     }
 }

@@ -13,6 +13,8 @@ import java.util.List;
 public interface TripDao {
     @Query("SELECT * FROM trips ORDER BY tripID DESC")
     List<TripEntity> getAllTrips();
+    @Query("SELECT * FROM trips WHERE tripID = :tripID LIMIT 1")
+    TripEntity getTripByID(int tripID);
     @Insert
     void insert(TripEntity tripEntity);
     @Delete
