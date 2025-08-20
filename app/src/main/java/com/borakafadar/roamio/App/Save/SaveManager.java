@@ -8,6 +8,8 @@ import android.util.Log;
 import androidx.room.Room;
 
 import com.borakafadar.roamio.App.Trip;
+import com.borakafadar.roamio.App.User;
+import com.borakafadar.roamio.TripMapsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,19 @@ public class SaveManager {
         }).start();
     }
 
+    public static void deleteTrip(Context context, TripEntity tripEntity) {
+        TripDatabase db = Room.databaseBuilder(context, TripDatabase.class, "trip-database").build();
+        new Thread(() -> {
+            db.tripDao().delete(tripEntity);
+            Log.d("tripLog", "trip successfully deleted");
+        }).start();
+
+    }
+
     // Make the callback public so callers can pass a lambda/anonymous class
     public interface TripsCallback {
         void onTripsLoaded(List<TripEntity> trips);
+
         void onTripLoaded(TripEntity trip);
     }
 
@@ -66,5 +78,59 @@ public class SaveManager {
             Log.d("tripLog", "trip successfully updated");
         }).start();
     }
+
+    public static void getLatestTrip(Context context, TripsCallback callback) {
+        TripDatabase db = Room.databaseBuilder(context, TripDatabase.class, "trip-database").build();
+
+        new Thread(()->{
+            TripEntity trip = db.tripDao().getLatestTrip();
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.onTripLoaded(trip);
+            });
+        }).start();
+    }
+
+    public interface UserCallback {
+        void onUserLoaded(User user);
+        void onUserCountLoaded(int count);
+    }
+
+    public static void saveUser(Context context, User user){
+        UserDatabase db = Room.databaseBuilder(context, UserDatabase.class, "user-database").build();
+        new Thread(() -> {
+            user.setTripEntitiesToJson();
+            db.userDao().insert(user);
+            Log.d("userLog", "user successfully inserted");
+        }).start();
+    }
+
+    public static void updateUser(Context context, User user){
+        UserDatabase db = Room.databaseBuilder(context, UserDatabase.class, "user-database").build();
+        new Thread(() -> {
+            db.userDao().update(user);
+        }).start();
+    }
+
+    public static void getUser(Context context, UserCallback userCallback){
+        UserDatabase db = Room.databaseBuilder(context, UserDatabase.class, "user-database").build();
+        new Thread(() -> {
+            User user = db.userDao().getUser();
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                userCallback.onUserLoaded(user);
+            });
+        }).start();
+    }
+    public static void getUserCount(Context context, UserCallback userCallback){
+        UserDatabase db = Room.databaseBuilder(context, UserDatabase.class, "user-database").build();
+        new Thread(() -> {
+            int count = db.userDao().userCount();
+            new Handler(Looper.getMainLooper()).post(() -> {
+                userCallback.onUserCountLoaded(count);
+            });
+        }).start();
+    }
+
+
 
 }

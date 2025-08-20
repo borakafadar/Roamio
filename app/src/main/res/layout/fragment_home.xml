@@ -1,23 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".HomeFragment"
+    android:layout_margin="10dp"
+    >
 
-    <!-- TODO: Update blank fragment layout -->
 
-    <TextView
-        android:layout_width="123dp"
-        android:layout_height="123dp"
-        android:id="@+id/textView1"
-        android:text="Home" />
+    <LinearLayout
+        android:id="@+id/lastTripLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_trip_text"
+            android:textSize="20sp"
+            android:layout_margin="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false">
+            <include
+                android:id="@+id/lastTripCardView"
+                layout="@layout/card_view_trips"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/mapsButton"
-        android:layout_width="123dp"
+        android:id="@+id/startTripButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/textView1"
-        android:text="Maps" />
+        android:text="@string/start_trip_text"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lastTripLinearLayout"
+        app:layout_constraintVertical_bias="0.648" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/welcomeUserTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome_user_text"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/lastTripLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.21" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

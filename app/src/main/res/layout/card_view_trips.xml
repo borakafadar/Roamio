@@ -4,16 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="20dp">
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    >
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="409dp"
+        android:layout_width="400dp"
         android:layout_height="100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:cardCornerRadius="20dp"
+
 
         >
 
@@ -40,6 +43,8 @@
                 android:layout_marginStart="16dp"
                 android:text="@string/trip_title_placeholder"
                 android:textSize="20sp"
+                android:maxWidth="240dp"
+                android:singleLine="true"
                 app:layout_constraintStart_toEndOf="@+id/tripCardImageView"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,6 +57,7 @@
                 android:layout_marginBottom="5dp"
                 android:text="@string/trip_comment_placeholder"
                 android:maxWidth="240dp"
+                android:singleLine="true"
                 app:layout_constraintStart_toStartOf="@+id/tripCardTitleTextView"
                 app:layout_constraintTop_toBottomOf="@+id/tripCardTitleTextView" />
 

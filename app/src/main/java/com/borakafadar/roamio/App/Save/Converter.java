@@ -21,6 +21,19 @@ public class Converter {
         return tripSegments;
     }
 
+    public static String convertTripEntitiesToJson(ArrayList<TripEntity> tripEntities){
+        Gson gson = new Gson();
+        return gson.toJson(tripEntities);
+    }
+
+    public static ArrayList<TripEntity> convertJsonToTripEntities(String json){
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<TripEntity>>(){}.getType();
+        ArrayList<TripEntity> tripEntities = gson.fromJson(json, type);;
+
+        return tripEntities;
+    }
+
     public static TripEntity tripToTripEntity(Trip trip){
         TripEntity tripEntity = new TripEntity();
         tripEntity.date= trip.getDateTimeString();
@@ -35,7 +48,6 @@ public class Converter {
     public static Trip tripEntityToTrip(TripEntity tripEntity){
         //TODO: implement method
         Trip trip = new Trip();
-
 
         return trip;
     }

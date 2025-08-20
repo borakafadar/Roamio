@@ -91,6 +91,15 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
 
+        Button deleteTripButton = findViewById(R.id.pastTripDeleteTripButton);
+
+        deleteTripButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteTrip();
+            }
+        });
+
 
 
         Handler handler = new Handler(Looper.getMainLooper());
@@ -262,6 +271,23 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
                     SaveManager.updateTrip(this, tripEntity);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                }).create();
+
+        alertDialog.show();
+    }
+
+    public void deleteTrip(){
+        View view = LayoutInflater.from(this).inflate(R.layout.alert_dialog, null);
+        TextView textView = view.findViewById(R.id.alertDialogTextView);
+        textView.setText(R.string.trip_delete_confirmation_text);
+
+        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle("Delete Trip").setView(view)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    SaveManager.deleteTrip(TripMapsActivity.this,tripEntity);
+                    finish();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
                     dialog.dismiss();
                 }).create();
 

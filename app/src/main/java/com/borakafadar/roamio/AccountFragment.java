@@ -12,11 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.borakafadar.roamio.App.Save.SaveManager;
+import com.borakafadar.roamio.App.User;
+
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +46,9 @@ public class AccountFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+
+    private User user;
 
     public AccountFragment() {
         // Required empty public constructor
@@ -70,6 +80,7 @@ public class AccountFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        getUser();
 
 
     }
@@ -80,12 +91,26 @@ public class AccountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_account, container, false);
 
-        view.findViewById(R.id.permissionButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestRuntimePermission();
-            }
+//        view.findViewById(R.id.permissionButton).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                requestRuntimePermission();
+//            }
+//        });
+
+
+
+        Handler handler = new Handler();
+        Runnable runnable = (() ->{
+            TextView userNameTextView = view.findViewById(R.id.userNameTextView);
+            TextView userTotalDurationTextView = view.findViewById(R.id.userTotalDurationTextView);
+            TextView userTotalDistanceTextView = view.findViewById(R.id.userTotalDistanceTextView);
+
+            userNameTextView.setText(user.getName());
+            userTotalDistanceTextView.setText(String.format(Locale.ENGLISH,"%.2f km",user.getDistance()));
+            userTotalDurationTextView.setText(user.parseTime());
         });
+        handler.postDelayed(runnable,1000);
 
         return view;
     }
@@ -135,5 +160,21 @@ public class AccountFragment extends Fragment {
         } else {
             requestRuntimePermission();
         }
+    }
+
+    public void getUser(){
+        SaveManager.getUser(this.getContext(), new SaveManager.UserCallback() {
+            @Override
+            public void onUserLoaded(User user) {
+                user.setTripEntitiesFromJson();
+                AccountFragment.this.user = user;
+            }
+
+            @Override
+            public void onUserCountLoaded(int count) {
+                //nothing
+            }
+        });
+
     }
 }

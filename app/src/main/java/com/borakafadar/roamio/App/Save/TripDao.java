@@ -16,6 +16,8 @@ public interface TripDao {
     List<TripEntity> getAllTrips();
     @Query("SELECT * FROM trips WHERE tripID = :tripID LIMIT 1")
     TripEntity getTripByID(int tripID);
+    @Query("SELECT * FROM trips ORDER BY tripID DESC LIMIT 1")
+    TripEntity getLatestTrip();
     @Update
     void update(TripEntity tripEntity);
     @Insert

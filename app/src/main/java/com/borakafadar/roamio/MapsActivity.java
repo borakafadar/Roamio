@@ -21,9 +21,11 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.borakafadar.roamio.App.Save.Converter;
 import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Trip;
 import com.borakafadar.roamio.App.TripSegment;
+import com.borakafadar.roamio.App.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -63,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Trip currentTrip;
     private boolean pauseTrip;
     private Polyline routePolyline;
+    private User user;
     private boolean isFollowingMyLocation = true;
 
     @Override
@@ -119,6 +122,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         };
+
+
+
+        getUser();
 
 
 
@@ -196,6 +203,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         startActivity(intent);
 
                         SaveManager.saveTrip(MapsActivity.this, currentTrip);
+                        user.addTrip(Converter.tripToTripEntity(currentTrip));
+                        user.setTripEntitiesToJson();
+
+                        SaveManager.updateUser(MapsActivity.this, user);
 
                         MapsActivity.this.finish();
                     }
@@ -334,6 +345,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current Location" + location, Toast.LENGTH_SHORT).show();
+    }
+
+    public void getUser(){
+        SaveManager.getUser(this, new SaveManager.UserCallback() {
+            @Override
+            public void onUserLoaded(User user) {
+                MapsActivity.this.user = user;
+                user.setTripEntitiesFromJson();
+            }
+
+            @Override
+            public void onUserCountLoaded(int count) {
+                //nothing
+            }
+        });
     }
 
 }

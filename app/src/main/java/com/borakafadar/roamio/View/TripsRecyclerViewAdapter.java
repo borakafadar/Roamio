@@ -50,7 +50,7 @@ public class TripsRecyclerViewAdapter extends RecyclerView.Adapter<TripsRecycler
         holder.tripComment.setText(trips.get(position).getComments());
         holder.tripDate.setText(trips.get(position).getDate());
         holder.tripDuration.setText(trips.get(position).getDuration());
-        holder.tripDistance.setText(Double.toString(trips.get(position).getDistance())); //TODO change to km
+        holder.tripDistance.setText(String.format("%.2f", trips.get(position).getDistance()) + " km");
 
     }
 

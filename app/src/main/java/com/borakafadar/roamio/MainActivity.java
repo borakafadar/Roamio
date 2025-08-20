@@ -1,6 +1,7 @@
 package com.borakafadar.roamio;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -19,9 +20,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.borakafadar.roamio.App.Save.SaveManager;
+import com.borakafadar.roamio.App.User;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener {
+
+
+
+    //TODO check what is geofencing
+    //https://developer.android.com/develop/sensors-and-location/location/geofencing
+
+    //TODO check background work for background location tracking
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -34,6 +44,26 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+        SaveManager.getUserCount(this,new SaveManager.UserCallback(){
+            @Override
+            public void onUserLoaded(User user) {
+                //nothing
+            }
+            @Override
+            public void onUserCountLoaded(int count) {
+                if(count == 0){
+                    //welcome activity startup
+                    Toast.makeText(MainActivity.this, "The user not found", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+
+
 
         Toast.makeText(this, "The app is open", Toast.LENGTH_SHORT).show();
 

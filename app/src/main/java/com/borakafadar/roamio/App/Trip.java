@@ -82,15 +82,16 @@ public class Trip {
         return date;
     }
 
-    //1 second
-    public void calculateTime(){
+
+    public long calculateTime(){
         if(!tripStopped){
             long currentTime = Instant.now().toEpochMilli();
             long timeDifference = currentTime - timestampMillis;
             time += (long) (timeDifference / 1000.0);
             timestampMillis = currentTime;
         }
-        //return (long) time;
+
+        return time;
     }
 
     private String parseTime(){
