@@ -45,10 +45,4 @@ public class Converter {
         return tripEntity;
     }
 
-    public static Trip tripEntityToTrip(TripEntity tripEntity){
-        //TODO: implement method
-        Trip trip = new Trip();
-
-        return trip;
-    }
 }

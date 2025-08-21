@@ -107,6 +107,9 @@ public class SaveManager {
     public static void updateUser(Context context, User user){
         UserDatabase db = Room.databaseBuilder(context, UserDatabase.class, "user-database").build();
         new Thread(() -> {
+            user.setTripEntitiesToJson();
+            user.calculateData();
+            Log.d("userDb", "user successfully updated");
             db.userDao().update(user);
         }).start();
     }

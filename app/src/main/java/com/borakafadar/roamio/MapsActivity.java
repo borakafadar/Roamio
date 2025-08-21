@@ -352,7 +352,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onUserLoaded(User user) {
                 MapsActivity.this.user = user;
-                user.setTripEntitiesFromJson();
+                //user.setTripEntitiesFromJson();
+                user.setTripEntitiesFromTripsTable(MapsActivity.this);
             }
 
             @Override

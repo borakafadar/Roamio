@@ -30,6 +30,14 @@
     <string name="continue_button_text">Continue</string>
     <string name="user_total_duration_text">Total Duration:</string>
     <string name="user_total_distance_text">Total Distance:</string>
+    <string name="settings_back_button_text">Back to user</string>
+    <string name="settings_text">Settings</string>
+    <string name="user_image_text">User image</string>
+    <string name="user_name_placeholder">User</string>
+    <string name="settings_title_placeholder">Settings Title</string>
+    <string name="setting_detail_placeholder">This is a detail about the specific setting</string>
+    <string name="change_user_name_text">Change User Name</string>
+    <string name="change_user_name_details">Change your visible user name.</string>
 
 
 </resources>

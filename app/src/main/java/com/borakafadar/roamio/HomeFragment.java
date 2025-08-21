@@ -150,7 +150,8 @@ public class HomeFragment extends Fragment {
         SaveManager.getUser(this.getContext(), new SaveManager.UserCallback(){
             @Override
             public void onUserLoaded(User user) {
-                user.setTripEntitiesFromJson();
+                //user.setTripEntitiesFromJson();
+                user.setTripEntitiesFromTripsTable(HomeFragment.this.getContext());
                 HomeFragment.this.user = user;
             }
             @Override

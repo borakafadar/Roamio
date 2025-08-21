@@ -112,6 +112,14 @@ public class AccountFragment extends Fragment {
         });
         handler.postDelayed(runnable,1000);
 
+        view.findViewById(R.id.settingsButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new SettingsFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+            }
+        });
+
         return view;
     }
 
@@ -166,7 +174,8 @@ public class AccountFragment extends Fragment {
         SaveManager.getUser(this.getContext(), new SaveManager.UserCallback() {
             @Override
             public void onUserLoaded(User user) {
-                user.setTripEntitiesFromJson();
+                //user.setTripEntitiesFromJson();
+                user.setTripEntitiesFromTripsTable(AccountFragment.this.getContext());
                 AccountFragment.this.user = user;
             }
 

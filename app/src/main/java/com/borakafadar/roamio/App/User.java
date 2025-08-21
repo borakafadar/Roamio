@@ -1,14 +1,18 @@
 package com.borakafadar.roamio.App;
 
+import android.content.Context;
 import android.location.Location;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.borakafadar.roamio.App.Save.Converter;
+import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Save.TripEntity;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 @Entity(tableName = "user")
 public class User {
@@ -61,9 +65,17 @@ public class User {
     }
 
     public void addTrip(TripEntity tripEntity){
-        distance += tripEntity.getDistance();
-        duration += parseToTime(tripEntity.getDuration());
         tripEntities.add(tripEntity);
+        calculateData();
+    }
+
+    public void calculateData(){
+        distance = 0;
+        duration = 0;
+        for(TripEntity trip : tripEntities){
+            distance += trip.getDistance();
+            duration += parseToTime(trip.getDuration());
+        }
     }
 
     public String parseTime(){
@@ -73,7 +85,7 @@ public class User {
         long minutes = (totalTime % 3600) / 60;
         long seconds = totalTime % 60;
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return String.format(Locale.ENGLISH,"%02d:%02d:%02d", hours, minutes, seconds);
 
     }
 
@@ -105,6 +117,22 @@ public class User {
             return;
         }
         tripEntitiesJson = Converter.convertTripEntitiesToJson(tripEntities);
+    }
+
+    public void setTripEntitiesFromTripsTable(Context context){
+        SaveManager.getAllTrips(context, new SaveManager.TripsCallback() {
+            @Override
+            public void onTripsLoaded(List<TripEntity> trips) {
+                tripEntities = (ArrayList<TripEntity>) trips;
+                calculateData();
+                SaveManager.updateUser(context, User.this);
+            }
+
+            @Override
+            public void onTripLoaded(TripEntity trip) {
+                //nothing
+            }
+        });
     }
 
 }

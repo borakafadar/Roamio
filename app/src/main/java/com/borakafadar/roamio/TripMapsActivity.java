@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TripMapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -111,7 +112,7 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
                     comments.setText(tripEntity.getComments());
                     date.setText(tripEntity.getDate());
                     time.setText(tripEntity.getDuration());
-                    distance.setText(String.format("%.2f", tripEntity.getDistance()) + " km");
+                    distance.setText(String.format(Locale.ENGLISH,"%.2f", tripEntity.getDistance()) + " km");
 
 
                     updatePolylines(tripEntity.getTripSegments());
