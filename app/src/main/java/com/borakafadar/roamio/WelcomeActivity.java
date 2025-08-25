@@ -34,6 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         //TODO handle the things
+        //thanks for fucks sake what the hell does this mean??
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.alert_dialog, null);
         TextView textView = dialogView.findViewById(R.id.alertDialogTextView);
@@ -49,6 +50,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     public void onDismiss(DialogInterface dialog) {
                         Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 }).create();
 

@@ -134,6 +134,7 @@ public class Trip {
         return comments;
     }
     public double getDistance(){
+        calculateTotalDistance();
         return distance;
     }
     public String getTitle(){

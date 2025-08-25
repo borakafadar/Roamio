@@ -3,6 +3,7 @@ package com.borakafadar.roamio;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -110,10 +111,23 @@ public class HomeFragment extends Fragment {
                     TextView comments = cardView.findViewById(R.id.tripCardCommentsTextView);
 
                     title.setText(latestTrip.getTitle());
-                    distance.setText(String.format(Locale.ENGLISH,"%.2f", latestTrip.getDistance()) + " km");
+                    distance.setText(String.format(Locale.ENGLISH,"%.2f km", latestTrip.getDistance()));
                     date.setText(latestTrip.getDate());
                     duration.setText(latestTrip.getDuration());
                     comments.setText(latestTrip.getComments());
+
+
+                    cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(HomeFragment.this.getContext(),TripMapsActivity.class);
+
+                            intent.putExtra("TRIP_ID", latestTrip.tripID);
+
+                            startActivity(intent);
+                        }
+                    });
+
                 } else {
                     view.findViewById(R.id.lastTripLinearLayout).setVisibility(View.GONE);
                 }

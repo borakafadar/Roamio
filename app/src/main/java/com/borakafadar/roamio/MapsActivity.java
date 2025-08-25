@@ -7,13 +7,18 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.borakafadar.roamio.App.LocationService;
 import com.borakafadar.roamio.App.Save.Converter;
 import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Trip;
@@ -48,6 +54,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMyLocationButtonClickListener, OnMyLocationClickListener {
@@ -68,6 +75,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private User user;
     private boolean isFollowingMyLocation = true;
 
+    private final BroadcastReceiver locationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if("LOCATION_UPDATE".equals(intent.getAction())){
+                Location location = intent.getParcelableExtra("location");
+                Log.d("locationBroadcast", "Location received: " + location+" Intent: "+ intent);
+                if(location != null){
+
+                    if(!pauseTrip){
+                        currentTrip.getLatestSegment().addLocation(location);
+                    }
+
+                    updatePolyline();
+
+                    TextView tripTimeTextView = findViewById(R.id.tripTimeTextView);
+                    tripTimeTextView.setText(currentTrip.getDuration());
+
+                    TextView tripDistanceTextView = findViewById(R.id.tripDistanceTextView);
+                    //tripDistanceTextView.setText(currentTrip.getDistanceString());
+                    tripDistanceTextView.setText(String.format(Locale.ENGLISH,"%.2f km",currentTrip.getDistance()));
+
+                    LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    if(isFollowingMyLocation){
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation)); //to focus on the moving part
+                        //arbitrary number, subject to change
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); //to animate the camera
+                    }
+                    //mMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
+
+                }
+            }
+        }
+    };
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //TODO: change intervals into constants
         // for now it is 3000 and 2500
-        locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(1000).build();
+        //locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).setMinUpdateIntervalMillis(1000).build();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -91,37 +135,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
+//        locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(@NonNull LocationResult locationResult) {
+//                super.onLocationResult(locationResult);
+//
+//
+//                Location location = locationResult.getLastLocation();
+//                //currentTrip.addLocation(location); //old code without trip segments
+//                if(!pauseTrip){
+//                    currentTrip.getLatestSegment().addLocation(location);
+//                }
+//
+//                updatePolyline();
+//
+//                TextView tripTimeTextView = findViewById(R.id.tripTimeTextView);
+//                tripTimeTextView.setText(currentTrip.getDuration());
+//
+//                TextView tripDistanceTextView = findViewById(R.id.tripDistanceTextView);
+//                tripDistanceTextView.setText(currentTrip.getDistanceString());
+//
+//                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//                if(isFollowingMyLocation){
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation)); //to focus on the moving part
+//                    //arbitrary number, subject to change
+//                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); //to animate the camera
+//                }
+//                //mMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
+//
+//            }
+//        };
 
+        startLocationService();
 
-                //TODO: implement the pause button
-                Location location = locationResult.getLastLocation();
-                //currentTrip.addLocation(location); //old code without trip segments
-                if(!pauseTrip){
-                    currentTrip.getLatestSegment().addLocation(location);
-                }
-
-                updatePolyline();
-
-                TextView tripTimeTextView = findViewById(R.id.tripTimeTextView);
-                tripTimeTextView.setText(currentTrip.getDuration());
-
-                TextView tripDistanceTextView = findViewById(R.id.tripDistanceTextView);
-                tripDistanceTextView.setText(currentTrip.getDistanceString());
-
-                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                if(isFollowingMyLocation){
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation)); //to focus on the moving part
-                    //arbitrary number, subject to change
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(15)); //to animate the camera
-                }
-                //mMap.addMarker(new MarkerOptions().title("Here is your current location").position(currentLocation));
-
-            }
-        };
 
 
 
@@ -153,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bottomSheetBehavior.setHideable(false);
 
 
-        //TODO:initialize the buttons on a seperate method
+        //TODO:initialize the buttons on a separate method
 
         pauseTrip = false;
         Button pauseTripButton = findViewById(R.id.pauseTripButton);
@@ -269,7 +315,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         updateGPS(mMap);
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
 
 
 
@@ -277,7 +324,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback,null);
+        //fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback,null);
 
     }
 
@@ -347,6 +394,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, "Current Location" + location, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        IntentFilter filter =  new IntentFilter("LOCATION_UPDATE");
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            registerReceiver(locationReceiver,filter, Context.RECEIVER_NOT_EXPORTED);
+        }else{
+            registerReceiver(locationReceiver,filter, Context.RECEIVER_EXPORTED);
+        }
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        //unregisterReceiver(locationReceiver);
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        unregisterReceiver(locationReceiver);
+        stopLocationService();
+    }
+
     public void getUser(){
         SaveManager.getUser(this, new SaveManager.UserCallback() {
             @Override
@@ -362,5 +431,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
+
+    private void startLocationService(){
+        Intent intent = new Intent(this, LocationService.class);
+        ContextCompat.startForegroundService(this,intent);
+    }
+    private void stopLocationService(){
+        Intent intent = new Intent(this, LocationService.class);
+        stopService(intent);
+    }
+
 
 }
