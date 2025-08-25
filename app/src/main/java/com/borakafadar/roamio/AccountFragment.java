@@ -110,7 +110,7 @@ public class AccountFragment extends Fragment {
             userTotalDistanceTextView.setText(String.format(Locale.ENGLISH,"%.2f km",user.getDistance()));
             userTotalDurationTextView.setText(user.parseTime());
         });
-        handler.postDelayed(runnable,1000);
+        handler.postDelayed(runnable,100);
 
         view.findViewById(R.id.settingsButton).setOnClickListener(new View.OnClickListener() {
             @Override

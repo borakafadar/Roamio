@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.borakafadar.roamio.App.Save.SaveManager;
 import com.borakafadar.roamio.App.Save.TripEntity;
+import com.borakafadar.roamio.App.Trip;
 import com.borakafadar.roamio.App.TripSegment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -101,6 +102,14 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
 
+        Button backButton = findViewById(R.id.tripsBackButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
 
 
         Handler handler = new Handler(Looper.getMainLooper());
@@ -112,7 +121,7 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
                     comments.setText(tripEntity.getComments());
                     date.setText(tripEntity.getDate());
                     time.setText(tripEntity.getDuration());
-                    distance.setText(String.format(Locale.ENGLISH,"%.2f", tripEntity.getDistance()) + " km");
+                    distance.setText(String.format(Locale.ENGLISH,"%.2f km", tripEntity.getDistance()));
 
 
                     updatePolylines(tripEntity.getTripSegments());
@@ -150,6 +159,8 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
 
 
 
+
+
     }
 
 
@@ -181,6 +192,15 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
             }
         };
         handler.postDelayed(runnable, 1000);
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.d("Google Map"," Current Zoom: "+ mMap.getCameraPosition().zoom);
+            }
+        });
+
+
     }
 
     public void updatePolylines(ArrayList<TripSegment> tripSegments){
@@ -217,20 +237,48 @@ public class TripMapsActivity extends FragmentActivity implements OnMapReadyCall
         double longitude = 0;
         double latitude = 0;
         int locationSize = 0;
-        //FIXME fix camera
+        ArrayList<Location> allLocations = new ArrayList<>();
+
         for(TripSegment segment : tripSegments){
             for(Location l : segment.getLocations()){
                 longitude+=l.getLongitude();
                 latitude+=l.getLatitude();
                 locationSize++;
+
+                allLocations.add(l);
+            }
+        }
+
+        //fix camera by making the camera adjust to different lengths between the farthest points
+        double longestDistance = 0;
+        for(int i = 0; i<allLocations.size()-1; i++){
+            for(int j = i+1; j < allLocations.size();j++){
+                double distanceBetweenTwoLocations = Trip.haversineFormula(allLocations.get(i).getLatitude(),
+                        allLocations.get(j).getLatitude(),allLocations.get(i).getLongitude(),allLocations.get(j).getLongitude());
+
+                if(distanceBetweenTwoLocations > longestDistance){
+                    longestDistance = distanceBetweenTwoLocations;
+                }
+
             }
         }
         longitude /= locationSize;
         latitude /= locationSize;
 
+        Log.d("tripLog", "Longest Distance: "+ longestDistance);
+        //float cameraZoom = (float) (9.25338368806733 + (34.8578119088207/longestDistance) - (58.9535128624399/(longestDistance*longestDistance))) - 0.20f;
+        float cameraZoom = (float) (9.7746041770133 + 6.9121823504117 * Math.exp(-0.1047644565100764 * longestDistance)) - 0.28f;
+
+
+        if(longestDistance < 1.30){
+            cameraZoom = 15;
+        }
+
+        Log.d("tripLog","Camera Zoom: "+cameraZoom);
+
         LatLng currentLocation = new LatLng(latitude, longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(cameraZoom));
 
     }
 

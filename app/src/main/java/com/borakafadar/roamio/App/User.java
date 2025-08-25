@@ -25,7 +25,6 @@ public class User {
     public double distance;
     public long duration;
     public String appSettingsJson;
-    //FIXME make a type converter thingy
     public transient ArrayList<TripEntity> tripEntities;
     public String tripEntitiesJson;
 

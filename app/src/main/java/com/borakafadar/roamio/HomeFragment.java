@@ -135,14 +135,15 @@ public class HomeFragment extends Fragment {
 
                 if(user != null){
                     TextView welcomeUser = view.findViewById(R.id.welcomeUserTextView);
-                    welcomeUser.setText("Welcome " + user.getName()+ "!");
+                    //welcomeUser.setText("Welcome " + user.getName()+ "!");
+                    welcomeUser.setText(String.format(Locale.ENGLISH,"Welcome %s!", user.getName()));
 
                 }
 
 
             }
         };
-        handler.postDelayed(runnable, 1000);
+        handler.postDelayed(runnable, 100);
 
         return view;
     }

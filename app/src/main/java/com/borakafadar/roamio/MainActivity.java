@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             public void onUserCountLoaded(int count) {
                 if(count == 0){
                     //welcome activity startup
-                    Toast.makeText(MainActivity.this, "The user not found", Toast.LENGTH_SHORT).show();
+                    Log.d("User","No user found, starting welcome activity");
                     Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
                     startActivity(intent);
                 }
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         } else if(shouldShowRequestPermissionRationale(FINE_LOCATION_PERMISSION)){
             View dialogView = LayoutInflater.from(this).inflate(R.layout.alert_dialog, null);
             TextView textView = dialogView.findViewById(R.id.alertDialogTextView);
-            textView.setText("Location permission is required to track your location and your trips, don't worry we won't share your location with anyone because your data is only stored in your device");
+            textView.setText("Location permission is required to track your location and your trips.\n Don't worry! We won't share your location with anyone because your data is only stored in your device");
 
             AlertDialog alertDialog = new MaterialAlertDialogBuilder(this).setTitle("Location permission").setView(dialogView)
                     .setCancelable(false).setPositiveButton("OK", (dialog, which) -> {

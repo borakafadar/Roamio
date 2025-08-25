@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,10 +95,17 @@ public class TripsFragment extends Fragment implements TripsRecyclerViewInterfac
             Log.e("tripLog", e +"\n error happened in returning trips to string");
         }
 
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                trips = getTripsFromDatabase();
+                recyclerView.setAdapter(new TripsRecyclerViewAdapter(TripsFragment.this.getActivity(), trips, TripsFragment.this));
+                recyclerView.setLayoutManager(new LinearLayoutManager(TripsFragment.this.getActivity()));
+            }
+        } ,100);
 
 
-        recyclerView.setAdapter(new TripsRecyclerViewAdapter(this.getActivity(), trips, this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
         return view;
     }

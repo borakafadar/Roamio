@@ -1,12 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Roamio" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Roamio" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorAccent">@color/color_accent</item>
         <item name="fontWeight">800</item>
-
-    <!-- TODO: add font -->
+        <item name="fontFamily">@font/outfit_semibold</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
 
 
 

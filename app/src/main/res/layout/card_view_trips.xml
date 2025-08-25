@@ -48,7 +48,6 @@
                 app:layout_constraintStart_toEndOf="@+id/tripCardImageView"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!--TODO: limit the comment size idk how tho -->
             <TextView
                 android:id="@+id/tripCardCommentsTextView"
                 android:layout_width="wrap_content"

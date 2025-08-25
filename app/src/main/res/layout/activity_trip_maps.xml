@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:id="@+id/past_trip_main_content_container">
 
+
         <fragment
             android:id="@+id/trips_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -20,6 +21,29 @@
             app:layout_anchor="@+id/past_trip_main_content_container"
             app:layout_anchorGravity="center"
             tools:context=".TripMapsActivity" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tripsBackButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/settings_back_button_text"
+                app:icon="@drawable/arrow_back"
+                android:gravity="center"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="30dp"
+                />
+
+        </RelativeLayout>
 
     </FrameLayout>
 
@@ -49,13 +73,13 @@
             android:gravity="center"
             >
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/pastTripTitleTextView"
                 android:text="@string/trip_title_placeholder"
                 android:textSize="30sp"/>
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/pastTripCommentTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,12 +108,12 @@
                 android:layout_marginRight="10dp"
                 >
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/trip_time_text" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/pastTripTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -107,12 +131,12 @@
                 android:orientation="vertical"
                 android:layout_marginHorizontal="10dp">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/total_distance_text" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/pastTripDistanceTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -130,12 +154,12 @@
                 android:orientation="vertical"
                 android:layout_marginLeft="10dp">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/trip_date_text" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/pastTripDateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

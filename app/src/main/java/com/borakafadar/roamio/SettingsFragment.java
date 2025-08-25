@@ -92,7 +92,7 @@ public class SettingsFragment extends Fragment {
             TextView userNameTextView = view.findViewById(R.id.userNameTextView);
             userNameTextView.setText(user.getName());
         });
-        handler.postDelayed(runnable,1000);
+        handler.postDelayed(runnable,100);
 
 
 
@@ -116,6 +116,14 @@ public class SettingsFragment extends Fragment {
                         .setView(dialogView).setPositiveButton("OK", (dialog, which) -> {
                             user.setName(editText.getText().toString());
                             SaveManager.updateUser(SettingsFragment.this.getContext(), user);
+
+                            Handler handler = new Handler();
+                            Runnable runnable = (() ->{
+                                TextView userNameTextView = view.findViewById(R.id.userNameTextView);
+                                userNameTextView.setText(user.getName());
+                            });
+                            handler.postDelayed(runnable,100);
+
                         }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                         .create();
                 alertDialog.show();
